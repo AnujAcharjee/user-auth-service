@@ -11,17 +11,20 @@ export const authMiddleware = async (req, res, next) => {
             return next(new AppError(STATUS_CODES.UNAUTHORIZED, "Access token missing"));
         }
 
-        const decodedAccessToken = verifyToken(accessToken);
-
-        if (decodedAccessToken) {
-            const user = await User.findById(decodedAccessToken._id).select("_id fullname username");
-            if (!user) {
-                return next(new AppError(STATUS_CODES.UNAUTHORIZED, "User not found"));
-            }
-
-            req.user = user;
-            return next();
+        let decodedAccessToken;
+        try {
+            decodedAccessToken = verifyToken(accessToken);
+        } catch (err) {
+            return next(new AppError(STATUS_CODES.UNAUTHORIZED, "Invalid access token"));
         }
+
+        const user = await User.findById(decodedAccessToken._id).select("_id fullname username");
+        if (!user) {
+            return next(new AppError(STATUS_CODES.UNAUTHORIZED, "User not found"));
+        }
+
+        req.user = user;
+        return next();
     } catch (error) {
         return next(new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, "Authentication failed"));
     }
