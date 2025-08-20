@@ -1,13 +1,17 @@
 export const COOKIE_OPTIONS_AT = {
-  httpOnly: true, // not accessible via JavaScript
-  secure: process.env.IS_PRODUCTION, // not accessible via JavaScript
+  httpOnly: true,
+  secure: process.env.IS_PRODUCTION,
   sameSite: "Strict",
-  path: process.env.COOKIE_PATH_AT, // specific path for refresh token
+  maxAge: 60 * 60 * 1000, // 1 hour,
+  path: '/api/user',
+  domain: "localhost",
 };
 
 export const COOKIE_OPTIONS_RT = {
-  httpOnly: true, // not accessible via JavaScript
-  secure: process.env.IS_PRODUCTION, // not accessible via JavaScript
+  httpOnly: true,
+  secure: process.env.IS_PRODUCTION,
   sameSite: "Strict",
-  path: process.env.COOKIE_PATH_RT, // specific path for refresh token
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/api/user',
+  domain: "localhost",
 };

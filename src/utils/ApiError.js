@@ -1,4 +1,4 @@
-class AppError extends Error {
+class ApiError extends Error {
     constructor(
         statusCode,
         message = "Internal server error",
@@ -28,4 +28,4 @@ class AppError extends Error {
     }
 }
 
-export default AppError;
+export default ApiError;

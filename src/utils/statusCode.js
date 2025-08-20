@@ -1,11 +1,11 @@
-const STATUS_CODES = {
-    // ✅ Success
+export const statusCode = Object.freeze({
+    // Success
     OK: 200,
     CREATED: 201,
     ACCEPTED: 202,
     NO_CONTENT: 204,
 
-    // ⚠️ Client Errors
+    // Client Errors
     BAD_REQUEST: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
@@ -13,13 +13,12 @@ const STATUS_CODES = {
     CONFLICT: 409,
     UNPROCESSABLE_ENTITY: 422,
     TOO_MANY_REQUESTS: 429,
+    PASSWORD_MISMATCH: 422,
 
-    // 🔥 Server Errors
+    // Server Errors
     INTERNAL_SERVER_ERROR: 500,
     NOT_IMPLEMENTED: 501,
     BAD_GATEWAY: 502,
     SERVICE_UNAVAILABLE: 503,
     GATEWAY_TIMEOUT: 504
-};
-
-export default STATUS_CODES;
+});

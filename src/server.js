@@ -6,7 +6,6 @@ import mongoose from "mongoose"
 const httpServer = createServer(app);
 
 const server = () => {
-
     mongoose.connect(process.env.MONGODB_URI)
         .then(() => {
             console.log("Connected to MongoDB");
@@ -15,8 +14,8 @@ const server = () => {
             console.error("MongoDB connection error:", error);
         });
 
-    httpServer.listen(process.env.PORT, () => {
-        console.log(`User Service is running on port ${process.env.PORT}`);
+    httpServer.listen(process.env.PORT || 3001, () => {
+        console.log(`User Service is running on port ${process.env.PORT || 3001}`);
     });
 }
 

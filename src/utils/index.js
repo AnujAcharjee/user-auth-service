@@ -1,7 +1,7 @@
-import asyncExpressHandler from './asyncHandler.js';
-import AppError from "./AppError.js";
+import asyncHandler from './asyncHandler.js';
+import ApiError from "./ApiError.js";
 import ApiResponse from "./ApiResponse.js";
-import STATUS_CODES from "./statusCodes.js";
-import {COOKIE_OPTIONS_AT, COOKIE_OPTIONS_RT} from "./cookiesOption.js";
+import { statusCode } from "./statusCode.js";
+import { COOKIE_OPTIONS_AT, COOKIE_OPTIONS_RT } from "./cookiesOption.js";
 
-export { asyncExpressHandler, AppError, ApiResponse, STATUS_CODES, COOKIE_OPTIONS_AT, COOKIE_OPTIONS_RT };
+export { asyncHandler, ApiError, ApiResponse, statusCode, COOKIE_OPTIONS_AT, COOKIE_OPTIONS_RT };
