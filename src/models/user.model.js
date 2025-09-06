@@ -28,17 +28,13 @@ const userSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+
         chatGroups: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Room',
             }
-        ],
-        refreshToken: {
-            type: String,
-            default: '',
-            trim: true,
-        }
+        ]
     },
     { timestamps: true }
 );

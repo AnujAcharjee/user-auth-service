@@ -1,29 +1,35 @@
 import { asyncHandler, ApiError, ApiResponse, statusCode, COOKIE_OPTIONS_AT } from "../../utils/index.js"
 import { User } from "../../models/user.model.js"
+import { Session } from "../../models/session.model.js"
 import { verifyToken } from "../../services/jwt.js";
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies?.refreshToken;
+    const { refreshToken } = req.cookies;
+    const { sessionId } = req.cookies;
 
-    if (!refreshToken) {
-        throw new ApiError(statusCode.UNAUTHORIZED, "Refresh token is missing");
+    if (!refreshToken || !sessionId) {
+        throw new ApiError(statusCode.UNAUTHORIZED, "Refresh token or session id missing");
+    }
+
+    const session = await Session.findById(sessionId).select("refreshToken");
+
+    if (!session) {
+        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid session id");
+    }
+
+    if (!session.refreshToken || session.refreshToken !== refreshToken) {
+        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid refresh token");
     }
 
     const decodedRefreshToken = verifyToken(refreshToken);
 
-    const user = await User.findById(decodedRefreshToken._id).select("_id fullname username refreshToken");
+    const user = await User.findById(decodedRefreshToken._id).select("_id fullname username");
 
-    if (!user || user.refreshToken !== refreshToken) {
-        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid refresh token");
+    if (!user) {
+        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid user id");
     }
 
     const newAccessToken = await user.generateAccessToken();
-
-    req.user = {
-        _id: user._id,
-        fullname: user.fullname,
-        username: user.username
-    };
 
     return res
         .status(statusCode.OK)

@@ -1,5 +1,8 @@
 import { asyncHandler, ApiError, ApiResponse, statusCode, COOKIE_OPTIONS_AT, COOKIE_OPTIONS_RT } from "../../utils/index.js"
 import { User } from "../../models/user.model.js"
+import { Session } from "../../models/session.model.js"
+import { getDeviceName } from "../../services/ua-parser.js"
+import { addSessionHash } from "../../services/redis/sessionHash.js"
 
 export const login = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
@@ -17,17 +20,31 @@ export const login = asyncHandler(async (req, res) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
-    user.refreshToken = refreshToken;
-    await user.save();
+    const session = await Session.create({
+        userId: user._id,
+        deviceName: getDeviceName(req),
+        ip: req.ip,
+        refreshToken
+    })
 
-    const resUser = {
-        fullname: user.fullname,
-        username: user.username,
-    }
+    // Add in redis
+    await addSessionHash(username, session._id);
 
     return res
         .status(statusCode.OK)
         .cookie("refreshToken", refreshToken, COOKIE_OPTIONS_RT)
         .cookie("accessToken", accessToken, COOKIE_OPTIONS_AT)
-        .json(new ApiResponse(statusCode.OK, "User logged in successfully", { user: resUser, accessToken }));
+        .cookie("sessionId", session._id.toString(), COOKIE_OPTIONS_RT)
+        .json(new ApiResponse(
+            statusCode.OK,
+            "User logged in successfully",
+            {
+                user: {
+                    fullname: user.fullname,
+                    username: user.username,
+
+                },
+                accessToken,
+                sessionId: session._id
+            }));
 })
