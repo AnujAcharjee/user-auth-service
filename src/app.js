@@ -3,7 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser'
 import errorHandler from "./middlewares/errorHandler.js";
 import authRouter from "./routes/auth.router.js"
-import userRouter from "./routes/user.router.js"
+import profileRouter from "./routes/profile.router.js"
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(cookieParser());
 
 app.use(errorHandler);
 
-app.use("/", authRouter);
-app.use("/", userRouter);
+app.use("/auth", authRouter);
+app.use("/profile", profileRouter);
 
 export default app;

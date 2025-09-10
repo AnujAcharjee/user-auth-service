@@ -22,7 +22,7 @@ export const logout = asyncHandler(async (req, res) => {
     });
 
     // Delete from redis
-    await delSessionHash(username, session._id);
+    // await delSessionHash(username, session._id);
 
     return res
         .status(statusCode.OK)
