@@ -1,14 +1,9 @@
 import mongoose from "mongoose"
-import { hashPassword, verifyPassword } from "../services/bcrypt.js"
+import { verifyPassword } from "../services/bcrypt.js"
 import { generateAccessToken, generateRefreshToken } from "../services/jwt.js"
 
 const userSchema = new mongoose.Schema(
     {
-        fullname: {
-            type: String,
-            required: true,
-            trim: true,
-        },
         username: {
             type: String,
             required: true,
@@ -29,17 +24,35 @@ const userSchema = new mongoose.Schema(
             trim: true,
         },
 
+        fullname: {
+            type: String,
+            trim: true,
+        },
+        avatar: {
+            type: String,
+            trim: true,
+        },
+        bio: {
+            type: String,
+        },
+
+        chatFriends: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',
+            }
+        ],
         chatGroups: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Room',
+                ref: 'Group',
             }
-        ]
+        ],
     },
     { timestamps: true }
 );
 
-userSchema.pre("save", hashPassword);
+// userSchema.pre("save", hashPassword);
 
 userSchema.methods.verifyPassword = verifyPassword;
 userSchema.methods.generateAccessToken = generateAccessToken;

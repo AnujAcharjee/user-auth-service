@@ -5,13 +5,16 @@ import { verifyToken } from "../../services/jwt.js";
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
     const { refreshToken } = req.cookies;
-    const { sessionId } = req.cookies;
 
-    if (!refreshToken || !sessionId) {
-        throw new ApiError(statusCode.UNAUTHORIZED, "Refresh token or session id missing");
+    if (!refreshToken) {
+        throw new ApiError(statusCode.UNAUTHORIZED, "Refresh token missing");
     }
 
-    const session = await Session.findById(sessionId).select("refreshToken");
+    // decode refresh token
+    const decodedRefreshToken = verifyToken(refreshToken); // {userId, username, sessionId }
+    const sessionId = decodedRefreshToken?.sessionId;
+
+    const session = await Session.findOne({ sessionId }).select("refreshToken");
 
     if (!session) {
         throw new ApiError(statusCode.UNAUTHORIZED, "Invalid session id");
@@ -21,15 +24,13 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(statusCode.UNAUTHORIZED, "Invalid refresh token");
     }
 
-    const decodedRefreshToken = verifyToken(refreshToken);
-
-    const user = await User.findById(decodedRefreshToken._id).select("_id fullname username");
+    const user = await User.findById(decodedRefreshToken.userId).select("_id fullname username");
 
     if (!user) {
-        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid user id");
+        throw new ApiError(statusCode.UNAUTHORIZED, "Invalid userId");
     }
 
-    const newAccessToken = await user.generateAccessToken();
+    const newAccessToken = await user.generateAccessToken(sessionId);
 
     return res
         .status(statusCode.OK)

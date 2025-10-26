@@ -11,19 +11,20 @@ export const authMiddleware = async (req, res, next) => {
             return next(new ApiError(statusCode.UNAUTHORIZED, "Access token missing"));
         }
 
-        let decodedAccessToken;
+        let decodedAccessToken; // {userId, username, sessionId, ...}
         try {
             decodedAccessToken = verifyToken(accessToken);
         } catch (err) {
             return next(new ApiError(statusCode.UNAUTHORIZED, "Invalid access token"));
         }
 
-        const user = await User.findById(decodedAccessToken._id).select("_id fullname username");
+        const user = await User.findById(decodedAccessToken.userId).select("_id fullname username");
         if (!user) {
             return next(new ApiError(statusCode.UNAUTHORIZED, "User not found"));
         }
 
         req.user = user;
+        req.sessionId = decodedAccessToken.sessionId;
         return next();
     } catch (error) {
         return next(new ApiError(statusCode.INTERNAL_SERVER_ERROR, "Authentication failed"));
